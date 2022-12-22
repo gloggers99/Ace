@@ -5,14 +5,15 @@
 
 // todo list:
 // - gaps
-// - automatic keybind setup
 // - basic window manager stuff (killing windows, moving them)
 // - grid hinter (hardest feature yet)
 // - sloppy focus
 // - unmap windows that are out of focus (save ram maybe?)
 
 // done list:
+// - command dispatcher (needs work)
 // - borders
+// - automatic keybind setup
 // - infinity grid like movement
 // - window manager foundation
 

@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include <sstream>
 
 extern "C" {
     #include <X11/Xlib.h>
@@ -54,9 +55,14 @@ private:
     void bindKey(KeySym keySym, unsigned int mod);
     void bindButton(unsigned int button, unsigned int mod);
     std::vector<Window> getCurrentWindows(bool queryTree);
+    bool isWindowValid(Window window);
+
+    /* other */
+    void commandDispatcher(std::string input);
 
     /* window manager functions */
     void focusWindow(Window window  );
+    void killWindow(Window window);
     void run();
     void shift(Direction direction);
     void shutdown();

@@ -28,10 +28,10 @@ A: If Ace is missing a feature (and isn't on the TODO list below) and you deem i
 ## Features (All will be implemented at some point)
 - [X] Grid like movement ("Infinity Grid")
 - [ ] Window grid shifting
-- [ ] Basic keybind system
+- [X] Basic keybind system
 - [ ] Compositing (jonaburg-picom works great)
 - [ ] Grid location hinter
-- [ ] More in-depth features listed at the top of main.cpp!
+- [X] More in-depth features listed at the top of main.cpp!
 
 ## Active bugs (Check means fixed)
 - [X] None!

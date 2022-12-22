@@ -5,11 +5,18 @@
 #ifndef ACE_CONFIG_HPP
 #define ACE_CONFIG_HPP
 
-#include <vector>
+#include <map>
 
 class Config {
 public:
-    //std::vector<std::pair<KeySym, (*func)(int)>> =
+    std::map<std::pair<unsigned int, KeySym>, std::string> keyBinds = {
+            {{Mod4Mask, XK_w}, "shift up"},
+            {{Mod4Mask, XK_a}, "shift left"},
+            {{Mod4Mask, XK_s}, "shift down"},
+            {{Mod4Mask, XK_d}, "shift right"},
+            {{Mod4Mask | ShiftMask, XK_c}, "kill"},
+            {{Mod4Mask | ShiftMask, XK_q}, "shutdown"}
+    };
 
     unsigned int gapSize = 10;
     unsigned int borderSize = 2;

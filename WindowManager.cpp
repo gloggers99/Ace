@@ -5,6 +5,8 @@
 #include "WindowManager.hpp"
 #include <X11/keysymdef.h>
 
+#include <utility>
+
 /* helpers */
 
 void WindowManager::bindKey(KeySym keySym, unsigned int modifier) {
@@ -78,6 +80,47 @@ std::vector<Window> WindowManager::getCurrentWindows(bool queryTree = false) {
     return currentWindows;
 }
 
+bool WindowManager::isWindowValid(Window window) {
+    // the window is valid if its part of this->windows
+    // and it's not equal to 0.
+
+    if (std::find(this->windows.begin(), this->windows.end(), window) != this->windows.end()
+     && window != 0) {
+        return true;
+    }
+
+    return false;
+}
+
+/* other */
+
+void WindowManager::commandDispatcher(std::string input) {
+    std::stringstream commandStream(input);
+    std::string tmp;
+
+    std::vector<std::string> command;
+
+    while (getline(commandStream, tmp, ' '))
+        command.push_back(tmp);
+
+    if (!command.empty()) {
+        if (command[0] == "shutdown")
+            this->shutdown();
+        if (command[0] == "shift") {
+            if (command[1] == "up")
+                this->shift(Direction::UP);
+            if (command[1] == "down")
+                this->shift(Direction::DOWN);
+            if (command[1] == "left")
+                this->shift(Direction::LEFT);
+            if (command[1] == "right")
+                this->shift(Direction::RIGHT);
+        }
+        if (command[0] == "kill")
+            this->killWindow(this->focusedWindow);
+    }
+}
+
 /* window manager functions */
 
 void WindowManager::focusWindow(Window window) {
@@ -95,6 +138,12 @@ void WindowManager::focusWindow(Window window) {
         XSetInputFocus(this->display, this->focusedWindow, RevertToNone, CurrentTime);
         XSetWindowBorderWidth(this->display, this->focusedWindow, this->config.borderSize);
         XSetWindowBorder(this->display, window, this->config.focusedBorderColor);
+    }
+}
+
+void WindowManager::killWindow(Window window) {
+    if (this->isWindowValid(window)) {
+        XKillClient(this->display, window);
     }
 }
 
@@ -131,6 +180,12 @@ void WindowManager::run() {
                     this->shift(Direction::DOWN);
                 } else if (XKeycodeToKeysym(this->display, event.xkey.keycode, 0) == 'd') {
                     this->shift(Direction::RIGHT);
+                }
+
+                for (std::pair<std::pair<unsigned int, KeySym>, std::string> keybind : this->config.keyBinds) {
+                    if (XKeycodeToKeysym(this->display, event.xkey.keycode, 0) == keybind.first.second) {
+                        this->commandDispatcher(keybind.second);
+                    }
                 }
 
                 /*std::cout << "\033[2J\033[1;1H";
@@ -213,12 +268,13 @@ void WindowManager::shift(Direction direction) {
 
 void WindowManager::shutdown() {
     XCloseDisplay(this->display);
+    exit(0);
 }
 
 /* constructors */
 
 WindowManager::WindowManager(Config config) {
-    this->config = config;
+    this->config = std::move(config);
 
     XSetErrorHandler(WindowManager::x_error_handler);
 
@@ -239,10 +295,14 @@ WindowManager::WindowManager(Config config) {
     this->bindButton(Button1, 0);
     this->bindButton(Button3, 0);
 
-    this->bindKey(XK_w, 0);
-    this->bindKey(XK_a, 0);
-    this->bindKey(XK_s, 0);
-    this->bindKey(XK_d, 0);
+    //this->bindKey(XK_w, 0);
+    //this->bindKey(XK_a, 0);
+    //this->bindKey(XK_s, 0);
+    //this->bindKey(XK_d, 0);
+
+    for (std::pair<std::pair<unsigned int, KeySym>, std::string> keybind : this->config.keyBinds) {
+        this->bindKey(keybind.first.second, keybind.first.first);
+    }
 
     this->run();
 }
